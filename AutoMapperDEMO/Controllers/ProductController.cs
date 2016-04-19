@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using AutoMapperDEMO.Models;
+using AutoMapper;
 
 namespace AutoMapperDEMO.Controllers
 {
@@ -18,7 +19,7 @@ namespace AutoMapperDEMO.Controllers
         public ActionResult Index()
         {
             var product = db.Product.Include(p => p.ProductCategory);
-            return View(product.ToList());
+            return View(product.Where(s => !s.IsDelete).ToList());
         }
 
         // GET: Product/Details/5
@@ -33,7 +34,37 @@ namespace AutoMapperDEMO.Controllers
             {
                 return HttpNotFound();
             }
-            return View(product);
+            #region 使用前
+            //ProductDetailViewModel vm = new ProductDetailViewModel()
+            //{
+            //    Id = product.Id,
+            //    Name = product.Name,
+            //    SerialNo = product.SerialNo,
+            //    Attribute = product.Attribute,
+            //    Price = product.Price,
+            //    PromotionPrice = product.PromotionPrice,
+            //    LimitCount = product.LimitCount,
+            //    SpecNote = product.SpecNote,
+            //    Description = product.Description,
+            //    ActiveEDate = product.ActiveEDate,
+            //    ActiveEnable = product.ActiveEnable,
+            //    ActiveSDate = product.ActiveSDate,
+            //    CreatedOnUtc = product.CreatedOnUtc,
+            //    ModifiedOnUtc = product.ModifiedOnUtc,
+            //    IsDelete = product.IsDelete,
+            //    CategoryName = product.ProductCategory.Name
+            //};
+            #endregion
+
+            #region 使用後
+            //建立類別轉換的設定
+            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
+                                                           .ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name))).CreateMapper();
+            ProductDetailViewModel vm = mapper.Map<ProductDetailViewModel>(product);
+
+            #endregion
+
+            return View(vm);
         }
 
         // GET: Product/Create
@@ -94,29 +125,19 @@ namespace AutoMapperDEMO.Controllers
             return View(product);
         }
 
-        // GET: Product/Delete/5
-        public ActionResult Delete(int? id)
+        // POST: Product/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
             Product product = db.Product.Find(id);
             if (product == null)
             {
                 return HttpNotFound();
             }
-            return View(product);
-        }
-
-        // POST: Product/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Product product = db.Product.Find(id);
-            db.Product.Remove(product);
+            product.IsDelete = true;
             db.SaveChanges();
+            TempData["message"] = "刪除成功";
             return RedirectToAction("Index");
         }
 

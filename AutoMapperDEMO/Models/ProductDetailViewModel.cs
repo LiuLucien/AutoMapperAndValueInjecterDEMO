@@ -17,9 +17,9 @@ namespace AutoMapperDEMO.Models
         public int Id { get; set; }
 
         ///<summary>
-        ///CategoryId
+        ///CategoryName
         ///<summary>
-        public int? CategoryId { get; set; }
+        public string CategoryName { get; set; }
 
         ///<summary>
         ///商品名稱
@@ -108,7 +108,5 @@ namespace AutoMapperDEMO.Models
         ///<summary>
         [Required(ErrorMessage = "{0}欄位必填")]
         public DateTime? ModifiedOnUtc { get; set; }
-
-
     }
 }
