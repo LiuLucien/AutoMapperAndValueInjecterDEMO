@@ -59,9 +59,9 @@ namespace AutoMapperDEMO.Controllers
             #region 使用後
             //建立類別轉換的設定
             IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
-                                                           .ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name))).CreateMapper();
+                                                           .ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name)))
+                                                           .CreateMapper();
             ProductDetailViewModel vm = mapper.Map<ProductDetailViewModel>(product);
-
             #endregion
 
             return View(vm);
@@ -70,8 +70,9 @@ namespace AutoMapperDEMO.Controllers
         // GET: Product/Create
         public ActionResult Create()
         {
-            ViewBag.CategoryId = new SelectList(db.ProductCategory, "Id", "Name");
-            return View();
+            ProductViewModel vm = new ProductViewModel();
+            vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name");
+            return View(vm);
         }
 
         // POST: Product/Create
@@ -79,17 +80,41 @@ namespace AutoMapperDEMO.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,CategoryId,Name,SerialNo,Attribute,Price,PromotionPrice,LimitCount,SpecNote,Description,ActiveSDate,ActiveEDate,ActiveEnable,IsDelete,CreatedOnUtc,ModifiedOnUtc")] Product product)
+        public ActionResult Create(ProductViewModel vm)
         {
             if (ModelState.IsValid)
             {
+                #region 使用前
+                //var product = new Product()
+                //{
+                //    Name = vm.Name,
+                //    SerialNo = vm.SerialNo,
+                //    CategoryId = vm.CategoryId,
+                //    SpecNote = vm.SpecNote,
+                //    Price = vm.Price,
+                //    PromotionPrice = vm.PromotionPrice,
+                //    LimitCount = vm.LimitCount,
+                //    ActiveSDate = vm.ActiveSDate,
+                //    ActiveEDate = vm.ActiveEDate,
+                //    ActiveEnable = vm.ActiveEnable,
+                //    Attribute = vm.Attribute,
+                //    Description = vm.Description,
+                //    CreatedOnUtc = DateTime.UtcNow
+                //};
+                #endregion
+                #region 使用後
+                IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
+                                                               .ForMember(s => s.Id, a => a.Ignore())
+                                                               .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow)))
+                                                               .CreateMapper();
+                var product = mapper.Map<Product>(vm);
                 db.Product.Add(product);
+                #endregion
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            ViewBag.CategoryId = new SelectList(db.ProductCategory, "Id", "Name", product.CategoryId);
-            return View(product);
+            vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name", vm.CategoryId);
+            return View(vm);
         }
 
         // GET: Product/Edit/5
