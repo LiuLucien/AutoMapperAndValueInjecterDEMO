@@ -84,8 +84,10 @@ namespace AutoMapperDEMO.Controllers
         {
             if (ModelState.IsValid)
             {
+                Product product = new Product();
+
                 #region 使用前
-                //var product = new Product()
+                //product = new Product()
                 //{
                 //    Name = vm.SerialNo + vm.Name,
                 //    CategoryId = vm.CategoryId,
@@ -97,15 +99,23 @@ namespace AutoMapperDEMO.Controllers
                 //    ActiveEDate = vm.ActiveEDate,
                 //    ActiveEnable = vm.ActiveEnable,
                 //    Attribute = vm.Attribute,
-                //    Description = vm.Description,
+                //    Description = vm.Desc,
                 //    CreatedOnUtc = DateTime.UtcNow
                 //};
                 #endregion
                 #region 使用後
+                ProductDemoModel demo = new ProductDemoModel();
                 IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
-                                                               .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc)))
+                                                               .ForMember(s => s.Id, a => a.Ignore())
+                                                               .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
+                                                               .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
+                                                               .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow)))
                                                                .CreateMapper();
-                var product = mapper.Map<Product>(vm);
+
+                IMapper mapperDemo = new MapperConfiguration(c => c.CreateMap<ProductDemoModel, Product>()).CreateMapper();
+
+                mapper.Map(vm, product);
+                product = mapperDemo.Map(demo, product);
                 db.Product.Add(product);
                 #endregion
                 db.SaveChanges();
