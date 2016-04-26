@@ -1,0 +1,137 @@
+﻿@model ValueInjecterDEMO.Models.ProductDetailViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Product</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CategoryName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CategoryName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SerialNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SerialNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Attribute)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Attribute)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PromotionPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PromotionPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LimitCount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LimitCount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SpecNote)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SpecNote)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ActiveSDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ActiveSDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ActiveEDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ActiveEDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ActiveEnable)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ActiveEnable)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDelete)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsDelete)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatedOnUtc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreatedOnUtc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ModifiedOnUtc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ModifiedOnUtc)
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

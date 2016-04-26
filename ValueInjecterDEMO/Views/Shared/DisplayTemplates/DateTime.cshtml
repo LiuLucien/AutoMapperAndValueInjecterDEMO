@@ -1,0 +1,23 @@
+﻿@model DateTime?
+@{
+    if (Model.HasValue)
+    {
+        DateTime dtCurrentTime;
+
+        // 判斷本機的時區設定是否為 UTC 時間，如果是，就要進行轉換，否則就直接顯示本地時間
+        if (TimeZoneInfo.Local.Equals(TimeZoneInfo.Utc))
+        {
+            // 以下是取得 "台北標準時區" 的標準寫法
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+
+            // 依據取得的時區進行時間轉換
+            dtCurrentTime = TimeZoneInfo.ConvertTime(Model.Value, tzi);
+        }
+        else
+        {
+            dtCurrentTime = Model.Value;
+        }
+
+        @dtCurrentTime.ToString("yyyy/MM/dd HH:mm")
+    }
+}
