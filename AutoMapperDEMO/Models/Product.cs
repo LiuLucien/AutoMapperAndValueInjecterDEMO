@@ -17,7 +17,6 @@ namespace AutoMapperDEMO.Models
         public int Id { get; set; }
         public Nullable<int> CategoryId { get; set; }
         public string Name { get; set; }
-        public string SerialNo { get; set; }
         public string Attribute { get; set; }
         public int Price { get; set; }
         public Nullable<int> PromotionPrice { get; set; }

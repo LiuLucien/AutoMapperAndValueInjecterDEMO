@@ -87,8 +87,7 @@ namespace AutoMapperDEMO.Controllers
                 #region 使用前
                 //var product = new Product()
                 //{
-                //    Name = vm.Name,
-                //    SerialNo = vm.SerialNo,
+                //    Name = vm.SerialNo + vm.Name,
                 //    CategoryId = vm.CategoryId,
                 //    SpecNote = vm.SpecNote,
                 //    Price = vm.Price,
@@ -104,8 +103,7 @@ namespace AutoMapperDEMO.Controllers
                 #endregion
                 #region 使用後
                 IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
-                                                               .ForMember(s => s.Id, a => a.Ignore())
-                                                               .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow)))
+                                                               .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc)))
                                                                .CreateMapper();
                 var product = mapper.Map<Product>(vm);
                 db.Product.Add(product);
@@ -129,8 +127,12 @@ namespace AutoMapperDEMO.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CategoryId = new SelectList(db.ProductCategory, "Id", "Name", product.CategoryId);
-            return View(product);
+            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductViewModel>()).CreateMapper();
+            ProductViewModel vm = mapper.Map<ProductViewModel>(product);
+
+            vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name", vm.CategoryId);
+
+            return View(vm);
         }
 
         // POST: Product/Edit/5
@@ -138,16 +140,42 @@ namespace AutoMapperDEMO.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,CategoryId,Name,SerialNo,Attribute,Price,PromotionPrice,LimitCount,SpecNote,Description,ActiveSDate,ActiveEDate,ActiveEnable,IsDelete,CreatedOnUtc,ModifiedOnUtc")] Product product)
+        public ActionResult Edit(ProductViewModel vm)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(product).State = EntityState.Modified;
+                Product product = db.Product.Find(vm.Id);
+
+                #region 使用前
+                //product.Name = vm.SerialNo + vm.Name;
+                //product.Price = vm.Price;
+                //product.CategoryId = vm.CategoryId;
+                //product.Description = vm.Desc;
+                //product.ActiveSDate = vm.ActiveSDate;
+                //product.ActiveEDate = vm.ActiveEDate;
+                //product.ActiveEnable = vm.ActiveEnable;
+                //product.Attribute = vm.Attribute;
+                //product.LimitCount = vm.LimitCount;
+                //product.ModifiedOnUtc = DateTime.UtcNow;
+                //product.PromotionPrice = vm.PromotionPrice;
+                //product.SpecNote = vm.SpecNote;
+                #endregion
+                #region 使用後
+                IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
+                                               .ForMember(s => s.Id, a => a.Ignore())
+                                               .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
+                                               .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
+                                               .ForMember(s => s.CreatedOnUtc, a => a.Ignore()))
+                                               .CreateMapper();
+                mapper.Map(vm, product);
+                #endregion
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CategoryId = new SelectList(db.ProductCategory, "Id", "Name", product.CategoryId);
-            return View(product);
+            vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name", vm.CategoryId);
+
+            return View(vm);
         }
 
         // POST: Product/Delete/5

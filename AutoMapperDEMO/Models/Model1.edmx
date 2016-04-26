@@ -12,8 +12,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CategoryId" Type="int" />
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="SerialNo" Type="nvarchar" MaxLength="20" Nullable="false" />
-          <Property Name="Attribute" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Attribute" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="Price" Type="int" Nullable="false" />
           <Property Name="PromotionPrice" Type="int" />
           <Property Name="LimitCount" Type="int" Nullable="false" />
@@ -75,8 +74,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CategoryId" Type="Int32" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SerialNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
-          <Property Name="Attribute" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Attribute" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="Price" Type="Int32" Nullable="false" />
           <Property Name="PromotionPrice" Type="Int32" />
           <Property Name="LimitCount" Type="Int32" Nullable="false" />
@@ -134,7 +132,6 @@
                 <ScalarProperty Name="PromotionPrice" ColumnName="PromotionPrice" />
                 <ScalarProperty Name="Price" ColumnName="Price" />
                 <ScalarProperty Name="Attribute" ColumnName="Attribute" />
-                <ScalarProperty Name="SerialNo" ColumnName="SerialNo" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />

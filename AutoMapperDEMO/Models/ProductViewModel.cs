@@ -81,13 +81,14 @@ namespace AutoMapperDEMO.Models
         ///商品說明
         ///<summary>
         [Display(Name = "商品說明")]
-        public string Description { get; set; }
+        public string Desc { get; set; }
 
         ///<summary>
         ///上架時間
         ///<summary>
         [Display(Name = "上架時間")]
         [Required(ErrorMessage = "{0}欄位必填"), DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime ActiveSDate { get; set; }
 
         ///<summary>
@@ -95,6 +96,7 @@ namespace AutoMapperDEMO.Models
         ///<summary>
         [Display(Name = "下架時間")]
         [Required(ErrorMessage = "{0}欄位必填"),DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime ActiveEDate { get; set; }
 
         ///<summary>
