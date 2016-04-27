@@ -34,26 +34,26 @@ namespace AutoMapperDEMO.Controllers
             {
                 return HttpNotFound();
             }
+            ProductDetailViewModel vm = new ProductDetailViewModel();
             #region 使用前
-            //ProductDetailViewModel vm = new ProductDetailViewModel()
-            //{
-            //    Id = product.Id,
-            //    Name = product.Name,
-            //    SerialNo = product.SerialNo,
-            //    Attribute = product.Attribute,
-            //    Price = product.Price,
-            //    PromotionPrice = product.PromotionPrice,
-            //    LimitCount = product.LimitCount,
-            //    SpecNote = product.SpecNote,
-            //    Description = product.Description,
-            //    ActiveEDate = product.ActiveEDate,
-            //    ActiveEnable = product.ActiveEnable,
-            //    ActiveSDate = product.ActiveSDate,
-            //    CreatedOnUtc = product.CreatedOnUtc,
-            //    ModifiedOnUtc = product.ModifiedOnUtc,
-            //    IsDelete = product.IsDelete,
-            //    CategoryName = product.ProductCategory.Name
-            //};
+            vm = new ProductDetailViewModel()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Attribute = product.Attribute,
+                Price = product.Price,
+                PromotionPrice = product.PromotionPrice,
+                LimitCount = product.LimitCount,
+                SpecNote = product.SpecNote,
+                Description = product.Description,
+                ActiveEDate = product.ActiveEDate,
+                ActiveEnable = product.ActiveEnable,
+                ActiveSDate = product.ActiveSDate,
+                CreatedOnUtc = product.CreatedOnUtc,
+                ModifiedOnUtc = product.ModifiedOnUtc,
+                IsDelete = product.IsDelete,
+                CategoryName = product.ProductCategory.Name
+            };
             #endregion
 
             #region 使用後
@@ -61,7 +61,7 @@ namespace AutoMapperDEMO.Controllers
             IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
                                                            .ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name)))
                                                            .CreateMapper();
-            ProductDetailViewModel vm = mapper.Map<ProductDetailViewModel>(product);
+            vm = mapper.Map<ProductDetailViewModel>(product);
             #endregion
 
             return View(vm);

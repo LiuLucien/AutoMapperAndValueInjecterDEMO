@@ -1,4 +1,5 @@
 ﻿using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -19,8 +20,8 @@ namespace ValueInjecterDEMO.Controllers
         // GET: Product
         public ActionResult Index()
         {
-            var product = db.Product.Include(p => p.ProductCategory);
-            return View(product.Where(s => !s.IsDelete).ToList());
+            var product = db.Product.Include(p => p.ProductCategory).Where(s => !s.IsDelete).OrderByDescending(s => s.CreatedOnUtc).ToList();
+            return View(product);
         }
 
         // GET: Product/Details/5
@@ -35,12 +36,13 @@ namespace ValueInjecterDEMO.Controllers
             {
                 return HttpNotFound();
             }
+            ProductDetailViewModel vm = new ProductDetailViewModel();
+
             #region 使用前
-            //ProductDetailViewModel vm = new ProductDetailViewModel()
+            //vm = new ProductDetailViewModel()
             //{
             //    Id = product.Id,
             //    Name = product.Name,
-            //    SerialNo = product.SerialNo,
             //    Attribute = product.Attribute,
             //    Price = product.Price,
             //    PromotionPrice = product.PromotionPrice,
@@ -56,10 +58,15 @@ namespace ValueInjecterDEMO.Controllers
             //    CategoryName = product.ProductCategory.Name
             //};
             #endregion
-
             #region 使用後
-            ProductDetailViewModel vm = new ProductDetailViewModel();
-            vm.InjectFrom(product);
+            Mapper.AddMap<Product, ProductDetailViewModel>(src =>
+            {
+                vm.InjectFrom(src);
+                vm.CategoryName = src.ProductCategory.Name;
+                return vm;
+            });
+            vm = Mapper.Map<Product, ProductDetailViewModel>(product);
+
             #endregion
 
             return View(vm);
@@ -83,7 +90,6 @@ namespace ValueInjecterDEMO.Controllers
             if (ModelState.IsValid)
             {
                 Product product = new Product();
-
                 #region 使用前
                 //product = new Product()
                 //{
@@ -102,7 +108,29 @@ namespace ValueInjecterDEMO.Controllers
                 //};
                 #endregion
                 #region 使用後
-                product.InjectFrom(vm);
+                ProductDemoModel demo = new ProductDemoModel();
+
+                var vmmapper = new MapperInstance();
+
+                vmmapper.AddMap<ProductViewModel, Product>(src =>
+                {
+                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id) }), src);
+                    product.Name = src.SerialNo + src.Name;
+                    product.Description = src.Desc;
+                    product.CreatedOnUtc = DateTime.UtcNow;
+                    return product;
+                });
+                var demomapper = new MapperInstance();
+
+                demomapper.AddMap<ProductDemoModel, Product>(src =>
+                {
+                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id) }), src);
+                    return product;
+                });
+
+                product = vmmapper.Map<ProductViewModel, Product>(vm);
+                product = demomapper.Map<ProductDemoModel, Product>(demo);
+
                 db.Product.Add(product);
                 #endregion
                 db.SaveChanges();
@@ -157,7 +185,14 @@ namespace ValueInjecterDEMO.Controllers
                 //product.SpecNote = vm.SpecNote;
                 #endregion
                 #region 使用後
-                product.InjectFrom(vm);
+                Mapper.AddMap<ProductViewModel, Product>(src =>
+                {
+                    product.InjectFrom(src);
+                    product.Name = src.SerialNo + src.Name;
+                    return product;
+                });
+
+                product = Mapper.Map<ProductViewModel, Product>(vm, product);
                 #endregion
 
                 db.SaveChanges();

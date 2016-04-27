@@ -105,5 +105,20 @@ namespace AutoMapperDEMO.Models
         [Display(Name = "允許上架狀態")]
         [Required(ErrorMessage = "{0}欄位必填")]
         public bool ActiveEnable { get; set; }
+
+        public ProductViewModel()
+        {
+            Name = "滑鼠";
+            SerialNo = "001";
+            Attribute = "3C";
+            Attribute = "電競";
+            Price = 1000;
+            PromotionPrice = 500;
+            LimitCount = 300;
+            SpecNote = "小";
+            Desc = "滑鼠";
+            ActiveSDate = DateTime.Now;
+            ActiveEDate = ActiveSDate.AddDays(1);
+        }
     }
 }
