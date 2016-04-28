@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using AutoMapperDEMO.Models;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace AutoMapperDEMO.Controllers
 {
@@ -18,8 +19,16 @@ namespace AutoMapperDEMO.Controllers
         // GET: Product
         public ActionResult Index()
         {
-            var product = db.Product.Include(p => p.ProductCategory);
-            return View(product.Where(s => !s.IsDelete).ToList());
+            var products = db.Product.Include(p => p.ProductCategory)
+                                     .Where(s => !s.IsDelete)
+                                     .OrderByDescending(s => s.CreatedOnUtc)
+                                     .ToList();
+
+            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductViewModel>()).CreateMapper();
+
+            List<ProductViewModel> vm = mapper.Map<List<ProductViewModel>>(products);
+
+            return View(vm);
         }
 
         // GET: Product/Details/5
@@ -29,41 +38,52 @@ namespace AutoMapperDEMO.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Product.Find(id);
+            Product product = GetProductById(id.Value);
             if (product == null)
             {
                 return HttpNotFound();
             }
             ProductDetailViewModel vm = new ProductDetailViewModel();
+
             #region 使用前
-            vm = new ProductDetailViewModel()
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Attribute = product.Attribute,
-                Price = product.Price,
-                PromotionPrice = product.PromotionPrice,
-                LimitCount = product.LimitCount,
-                SpecNote = product.SpecNote,
-                Description = product.Description,
-                ActiveEDate = product.ActiveEDate,
-                ActiveEnable = product.ActiveEnable,
-                ActiveSDate = product.ActiveSDate,
-                CreatedOnUtc = product.CreatedOnUtc,
-                ModifiedOnUtc = product.ModifiedOnUtc,
-                IsDelete = product.IsDelete,
-                CategoryName = product.ProductCategory.Name
-            };
+            //vm = new ProductDetailViewModel()
+            //{
+            //    Id = product.Id,
+            //    Name = product.Name,
+            //    Attribute = product.Attribute,
+            //    Price = product.Price,
+            //    PromotionPrice = product.PromotionPrice,
+            //    LimitCount = product.LimitCount,
+            //    SpecNote = product.SpecNote,
+            //    Description = product.Description,
+            //    ActiveEDate = product.ActiveEDate,
+            //    ActiveEnable = product.ActiveEnable,
+            //    ActiveSDate = product.ActiveSDate,
+            //    CreatedOnUtc = product.CreatedOnUtc,
+            //    ModifiedOnUtc = product.ModifiedOnUtc,
+            //    IsDelete = product.IsDelete,
+            //    CategoryName = product.ProductCategory.Name
+            //};
             #endregion
 
             #region 使用後
             //建立類別轉換的設定
-            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
-                                                           .ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name)))
-                                                           .CreateMapper();
+            IMapper mapper = new MapperConfiguration(c =>
+            {
+                c.CreateMap<Product, ProductDetailViewModel>();
+                c.AddProfile<ProductDetailsProfile>();
+            }).CreateMapper();
+
             vm = mapper.Map<ProductDetailViewModel>(product);
             #endregion
 
+            #region 導覽屬性對映，ProjectTo範例
+            //MapperConfiguration Config = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
+            //                                                           .ForMember(s => s.CategoryName,
+            //                                                                           a => a.MapFrom(x => x.ProductCategory.Name)));
+
+            //ProductDetailViewModel vm = db.Product.ProjectTo<ProductDetailViewModel>(Config).FirstOrDefault(s => s.Id == id);
+            #endregion
             return View(vm);
         }
 
@@ -105,12 +125,11 @@ namespace AutoMapperDEMO.Controllers
                 #endregion
                 #region 使用後
                 ProductDemoModel demo = new ProductDemoModel();
-                IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
-                                                               .ForMember(s => s.Id, a => a.Ignore())
-                                                               .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
-                                                               .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
-                                                               .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow)))
-                                                               .CreateMapper();
+                IMapper mapper = new MapperConfiguration(c =>
+                {
+                    c.CreateMap<ProductViewModel, Product>();
+                    c.AddProfile<ProductCreateProfile>();
+                }).CreateMapper();
 
                 IMapper mapperDemo = new MapperConfiguration(c => c.CreateMap<ProductDemoModel, Product>()).CreateMapper();
 
@@ -132,7 +151,7 @@ namespace AutoMapperDEMO.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Product.Find(id);
+            Product product = GetProductById(id.Value);
             if (product == null)
             {
                 return HttpNotFound();
@@ -154,7 +173,7 @@ namespace AutoMapperDEMO.Controllers
         {
             if (ModelState.IsValid)
             {
-                Product product = db.Product.Find(vm.Id);
+                Product product = GetProductById(vm.Id);
 
                 #region 使用前
                 //product.Name = vm.SerialNo + vm.Name;
@@ -171,19 +190,11 @@ namespace AutoMapperDEMO.Controllers
                 //product.SpecNote = vm.SpecNote;
                 #endregion
                 #region 使用後
-
-                IMapper mapper = new MapperConfiguration(c => c.CreateMap<ProductViewModel, Product>()
-                                               //設定Product的Id不對映
-                                               .ForMember(s => s.Id, a => a.Ignore())
-                                               //設定Product的Name對映到ProductViewModel的SerialNo加Name
-                                               .ForMember(s => s.Name, a => a.MapFrom(x => string.Format("{0}{1}",
-                                                                                                        x.SerialNo,
-                                                                                                        x.Name)))
-                                               //設定Product的Description對映到ProductViewModel的Desc
-                                               .ForMember(s => s.Description, a => a.MapFrom(x => x.Desc))
-                                               //設定Product的ModifiedOnUtc預設為DateTime.UtcNow
-                                               .ForMember(s => s.ModifiedOnUtc, a => a.UseValue(DateTime.UtcNow)))
-                                               .CreateMapper();
+                IMapper mapper = new MapperConfiguration(c =>
+                {
+                    c.CreateMap<ProductViewModel, Product>();
+                    c.AddProfile<ProductEditProfile>();
+                }).CreateMapper();
                 mapper.Map(vm, product);
                 #endregion
                 db.SaveChanges();
@@ -209,6 +220,11 @@ namespace AutoMapperDEMO.Controllers
             db.SaveChanges();
             TempData["message"] = "刪除成功";
             return RedirectToAction("Index");
+        }
+
+        private Product GetProductById(int id)
+        {
+            return db.Product.Include(s => s.ProductCategory).FirstOrDefault(s => s.Id == id);
         }
 
         protected override void Dispose(bool disposing)

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AutoMapperDEMO.Models.Product>
+﻿@model List<AutoMapperDEMO.Models.ProductViewModel>
 
 @{
     ViewBag.Title = "Index";
@@ -12,22 +12,22 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Attribute)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Attribute)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Price)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Price)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.LimitCount)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().LimitCount)
         </th>
         <th>
             上架時段
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ActiveEnable)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ActiveEnable)
         </th>
         <th></th>
     </tr>

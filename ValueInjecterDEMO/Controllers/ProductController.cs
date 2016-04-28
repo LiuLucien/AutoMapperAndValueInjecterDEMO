@@ -20,8 +20,15 @@ namespace ValueInjecterDEMO.Controllers
         // GET: Product
         public ActionResult Index()
         {
-            var product = db.Product.Include(p => p.ProductCategory).Where(s => !s.IsDelete).OrderByDescending(s => s.CreatedOnUtc).ToList();
-            return View(product);
+            var products = db.Product.Include(p => p.ProductCategory)
+                         .Where(s => !s.IsDelete)
+                         .OrderByDescending(s => s.CreatedOnUtc)
+                         .ToList();
+
+            List<ProductViewModel> vm = products.Select(s => new ProductViewModel().InjectFrom(s))
+                                                .Cast<ProductViewModel>().ToList();
+
+            return View(vm);
         }
 
         // GET: Product/Details/5
