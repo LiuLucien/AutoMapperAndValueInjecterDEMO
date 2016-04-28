@@ -187,8 +187,13 @@ namespace ValueInjecterDEMO.Controllers
                 #region 使用後
                 Mapper.AddMap<ProductViewModel, Product>(src =>
                 {
-                    product.InjectFrom(src);
+                    //設定Product的Id不對映
+                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id)}), src);
+                    //設定Product的Name對映到ProductViewModel的SerialNo加Name
                     product.Name = src.SerialNo + src.Name;
+                    //設定Product的Description對映到ProductViewModel的Desc
+                    product.Description = src.Desc;
+                    product.ModifiedOnUtc = DateTime.UtcNow;
                     return product;
                 });
 
