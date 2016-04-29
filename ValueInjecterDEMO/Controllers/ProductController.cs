@@ -45,7 +45,7 @@ namespace ValueInjecterDEMO.Controllers
             }
             ProductDetailViewModel vm = new ProductDetailViewModel();
 
-            #region 使用前
+            #region 傳統寫法
             //vm = new ProductDetailViewModel()
             //{
             //    Id = product.Id,
@@ -65,7 +65,7 @@ namespace ValueInjecterDEMO.Controllers
             //    CategoryName = product.ProductCategory.Name
             //};
             #endregion
-            #region 使用後
+            #region 使用套件的寫法
             Mapper.AddMap<Product, ProductDetailViewModel>(src =>
             {
                 vm.InjectFrom(src);
@@ -97,7 +97,7 @@ namespace ValueInjecterDEMO.Controllers
             if (ModelState.IsValid)
             {
                 Product product = new Product();
-                #region 使用前
+                #region 傳統寫法
                 //product = new Product()
                 //{
                 //    Name = vm.SerialNo + vm.Name,
@@ -114,7 +114,7 @@ namespace ValueInjecterDEMO.Controllers
                 //    CreatedOnUtc = DateTime.UtcNow
                 //};
                 #endregion
-                #region 使用後
+                #region 使用套件的寫法
                 ProductDemoModel demo = new ProductDemoModel();
 
                 var vmmapper = new MapperInstance();
@@ -177,7 +177,7 @@ namespace ValueInjecterDEMO.Controllers
             {
                 Product product = db.Product.Find(vm.Id);
 
-                #region 使用前
+                #region 傳統寫法
                 //product.Name = vm.SerialNo + vm.Name;
                 //product.Price = vm.Price;
                 //product.CategoryId = vm.CategoryId;
@@ -191,7 +191,7 @@ namespace ValueInjecterDEMO.Controllers
                 //product.PromotionPrice = vm.PromotionPrice;
                 //product.SpecNote = vm.SpecNote;
                 #endregion
-                #region 使用後
+                #region 使用套件的寫法
                 Mapper.AddMap<ProductViewModel, Product>(src =>
                 {
                     //設定Product的Id不對映

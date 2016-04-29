@@ -45,7 +45,7 @@ namespace AutoMapperDEMO.Controllers
             }
             ProductDetailViewModel vm = new ProductDetailViewModel();
 
-            #region 使用前
+            #region 傳統寫法
             //vm = new ProductDetailViewModel()
             //{
             //    Id = product.Id,
@@ -66,7 +66,7 @@ namespace AutoMapperDEMO.Controllers
             //};
             #endregion
 
-            #region 使用後
+            #region 使用套件的寫法
             //建立類別轉換的設定
             IMapper mapper = new MapperConfiguration(c =>
             {
@@ -106,7 +106,7 @@ namespace AutoMapperDEMO.Controllers
             {
                 Product product = new Product();
 
-                #region 使用前
+                #region 傳統寫法
                 //product = new Product()
                 //{
                 //    Name = vm.SerialNo + vm.Name,
@@ -123,7 +123,7 @@ namespace AutoMapperDEMO.Controllers
                 //    CreatedOnUtc = DateTime.UtcNow
                 //};
                 #endregion
-                #region 使用後
+                #region 使用套件的寫法
                 ProductDemoModel demo = new ProductDemoModel();
                 IMapper mapper = new MapperConfiguration(c =>
                 {
@@ -175,7 +175,7 @@ namespace AutoMapperDEMO.Controllers
             {
                 Product product = GetProductById(vm.Id);
 
-                #region 使用前
+                #region 傳統寫法
                 //product.Name = vm.SerialNo + vm.Name;
                 //product.Price = vm.Price;
                 //product.CategoryId = vm.CategoryId;
@@ -189,7 +189,7 @@ namespace AutoMapperDEMO.Controllers
                 //product.PromotionPrice = vm.PromotionPrice;
                 //product.SpecNote = vm.SpecNote;
                 #endregion
-                #region 使用後
+                #region 使用套件的寫法
                 IMapper mapper = new MapperConfiguration(c =>
                 {
                     c.CreateMap<ProductViewModel, Product>();

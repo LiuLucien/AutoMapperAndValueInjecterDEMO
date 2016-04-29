@@ -7,17 +7,6 @@ using AutoMapperDEMO.Models;
 
 namespace AutoMapperDEMO
 {
-    public class AutoMapperConfig
-    {
-        public static void Configure()
-        {
-            Mapper.Initialize(x =>
-            {
-                x.AddProfile<ProductDetailsProfile>();
-            });
-        }
-    }
-
     public class ProductDetailsProfile : Profile
     {
         protected override void Configure()
