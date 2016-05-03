@@ -11,9 +11,9 @@ namespace AutoMapperConsoleDEMO.CustomvalueresolversDEMO
     {
         public static void CustomvalueresolversTest()
         {
-            var config = new MapperConfiguration(cfg =>
-       cfg.CreateMap<Source, Destination>()
-         .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>()));
+            var config = new MapperConfiguration(cfg => 
+                        cfg.CreateMap<Source, Destination>()
+                        .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>()));
             config.AssertConfigurationIsValid();
 
             var source = new Source
@@ -21,7 +21,6 @@ namespace AutoMapperConsoleDEMO.CustomvalueresolversDEMO
                 Value1 = 5,
                 Value2 = 7
             };
-            //有問題
             var mapper = config.CreateMapper();
             var result = mapper.Map<Source, Destination>(source);
         }

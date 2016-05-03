@@ -12,8 +12,7 @@ namespace AutoMapperConsoleDEMO.CustomtypeconvertersDEMO
         public static void CustomtypeconvertersTest()
         {
             var config = new MapperConfiguration(cfg => {
-                //有問題
-                //cfg.CreateMap<string, int>().ConvertUsing(Convert.ToInt32);
+                cfg.CreateMap<string, int>().ConvertUsing<IntTypeConverter>();
                 cfg.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
                 cfg.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
                 cfg.CreateMap<Source, Destination>();
@@ -29,6 +28,14 @@ namespace AutoMapperConsoleDEMO.CustomtypeconvertersDEMO
 
             var mapper = config.CreateMapper();
             Destination result = mapper.Map<Source, Destination>(source);
+        }
+
+        public class IntTypeConverter : ITypeConverter<string, int>
+        {
+            public int Convert(ResolutionContext context)
+            {
+                return System.Convert.ToInt32(context.SourceValue);
+            }
         }
 
         public class DateTimeTypeConverter : ITypeConverter<string, DateTime>

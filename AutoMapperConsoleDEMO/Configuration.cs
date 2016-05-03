@@ -11,11 +11,12 @@ namespace AutoMapperConsoleDEMO.ConfigurationDEMO
     {
         public static void ConfigurationTest()
         {
-            var config = new MapperConfiguration(c =>
+            var config = new MapperConfiguration(cfg =>
             {
-                c.ReplaceMemberName("Ä", "A");
-                c.ReplaceMemberName("í", "i");
-                c.ReplaceMemberName("Airlina", "Airline");
+                cfg.ReplaceMemberName("Ä", "A");
+                cfg.ReplaceMemberName("í", "i");
+                cfg.ReplaceMemberName("Airlina", "Airline");
+                cfg.CreateMap<Source, Destination>();
             });
 
             var source = new Source

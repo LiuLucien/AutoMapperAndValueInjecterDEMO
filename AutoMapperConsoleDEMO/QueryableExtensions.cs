@@ -13,7 +13,7 @@ namespace AutoMapperConsoleDEMO.QueryableExtensionsDEMO
         cfg.CreateMap<OrderLine, OrderLineDTO>()
         .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
 
-        //需連接DB
+        //Todo: 需連接DB
         //public List<OrderLineDTO> GetLinesForOrder(int orderId)
         //{
         //    using (var context = new orderEntities())
