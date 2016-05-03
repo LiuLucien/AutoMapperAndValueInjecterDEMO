@@ -11,6 +11,7 @@ using AutoMapperConsoleDEMO.ConditionalMappingDEMO;
 using AutoMapperConsoleDEMO.OpenGenericsDEMO;
 using AutoMapperConsoleDEMO.CustomvalueresolversDEMO;
 using AutoMapperConsoleDEMO.ConfigurationDEMO;
+using AutoMapperConsoleDEMO.QueryableExtensionsDEMO;
 
 namespace AutoMapperConsoleDEMO
 {
@@ -45,6 +46,8 @@ namespace AutoMapperConsoleDEMO
             //Customvalueresolvers.CustomvalueresolversTest();
             ////可變換屬性名稱
             //Configuration.ConfigurationTest();
+            ////導覽屬性對映，可避免SELECT N+1問題
+            //QueryableExtensions.QueryableExtensionsTest();
         }
     }
 }

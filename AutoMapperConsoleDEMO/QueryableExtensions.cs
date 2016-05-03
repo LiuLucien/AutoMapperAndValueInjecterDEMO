@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using AutoMapperDEMO.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,39 +12,35 @@ namespace AutoMapperConsoleDEMO.QueryableExtensionsDEMO
     class QueryableExtensions
     {
         static MapperConfiguration Config = new MapperConfiguration(cfg =>
-        cfg.CreateMap<OrderLine, OrderLineDTO>()
-        .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
+                                            cfg.CreateMap<ProductCategory, CategoryViewModel>()
+                                            .ForMember(dto => dto.productNames,
+                                                              conf => conf.MapFrom(ol => ol.Product.Select(s => s.Name))
+                                                       ));
 
-        //Todo: 需連接DB
-        //public List<OrderLineDTO> GetLinesForOrder(int orderId)
-        //{
-        //    using (var context = new orderEntities())
-        //    {
-        //        return context.OrderLines.Where(ol => ol.OrderId == orderId)
-        //                 .ProjectTo<OrderLineDTO>(Config).ToList();
-        //    }
-        //}
-    }
+        public static void QueryableExtensionsTest()
+        {
+            using (var context = new AutoMapperAndValueInjecterDEMOEntities())
+            {
+                var category = context.ProductCategory.Include(nameof(context.Product)).FirstOrDefault();
 
-    public class OrderLine
-    {
-        public int Id { get; set; }
-        public int OrderId { get; set; }
-        public Item Item { get; set; }
-        public decimal Quantity { get; set; }
-    }
+                if (category != null)
+                {
+                    // Perform mapping
+                    var mapper = Config.CreateMapper();
+                    var result = mapper.Map<ProductCategory, CategoryViewModel>(category);
 
-    public class Item
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+                    var vm = GetProductNamesByCategoryId(category.Id);
+                }
+            }
+        }
 
-    public class OrderLineDTO
-    {
-        public int Id { get; set; }
-        public int OrderId { get; set; }
-        public string Item { get; set; }
-        public decimal Quantity { get; set; }
+        public static CategoryViewModel GetProductNamesByCategoryId(int CategoryId)
+        {
+            using (var context = new AutoMapperAndValueInjecterDEMOEntities())
+            {
+                return context.ProductCategory.Where(ol => ol.Id == CategoryId)
+                         .ProjectTo<CategoryViewModel>(Config).FirstOrDefault();
+            }
+        }
     }
 }
