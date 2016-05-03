@@ -50,4 +50,13 @@ namespace AutoMapperDEMO
                                                .ForMember(s => s.ModifiedOnUtc, a => a.UseValue(DateTime.UtcNow));
         }
     }
+
+    public class ProductCategoryProfile : Profile
+    {
+        protected override void Configure()
+        {
+            CreateMap<ProductCategory, CategoryViewModel>();
+            CreateMap<List<string>, CategoryViewModel>().ForMember(category => category.productNames, product => product.MapFrom(s => s));
+        }
+    }
 }

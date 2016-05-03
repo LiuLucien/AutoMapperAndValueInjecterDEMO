@@ -1,0 +1,30 @@
+﻿@model AutoMapperDEMO.Models.CategoryViewModel
+
+@{
+    ViewBag.Title = Model.Name;
+}
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            該類別的商品名稱列表
+        </dt>
+        <dd>
+            @foreach (var item in Model.productNames)
+            {
+                @item @:<br />
+            }
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "CategoryIndex")
+</p>

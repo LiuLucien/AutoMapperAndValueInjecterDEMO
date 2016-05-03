@@ -31,6 +31,41 @@ namespace AutoMapperDEMO.Controllers
             return View(vm);
         }
 
+        public ActionResult CategoryIndex()
+        {
+            var category = db.ProductCategory.OrderByDescending(s => s.CreatedOnUtc).ToList();
+            return View(category);
+        }
+
+        public ActionResult CategoryDetails(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //類別資料
+            var productCategory = db.ProductCategory.Find(id);
+            if (productCategory == null)
+            {
+                return HttpNotFound();
+            }
+            //屬於該類別的商品資料
+            var productNames = db.Product.Where(s => s.CategoryId == id).Select(s => s.Name).ToList();
+            var categoryViewModel = new CategoryViewModel();
+
+            IMapper mapper = new MapperConfiguration(c =>
+            {
+                c.AddProfile<ProductCategoryProfile>();
+            }).CreateMapper();
+
+            //對映類別資料
+            mapper.Map(productCategory, categoryViewModel);
+            //對映商品資料
+            mapper.Map(productNames, categoryViewModel);
+
+            return View(categoryViewModel);
+        }
+
         // GET: Product/Details/5
         public ActionResult Details(int? id)
         {
