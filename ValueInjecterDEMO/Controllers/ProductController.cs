@@ -68,9 +68,11 @@ namespace ValueInjecterDEMO.Controllers
             #region 使用套件的寫法
             Mapper.AddMap<Product, ProductDetailViewModel>(src =>
             {
-                vm.InjectFrom(src);
-                vm.CategoryName = src.ProductCategory.Name;
-                return vm;
+                var productviewModel = new ProductDetailViewModel();
+
+                productviewModel.InjectFrom(src);
+                productviewModel.CategoryName = src.ProductCategory.Name;
+                return productviewModel;
             });
             vm = Mapper.Map<Product, ProductDetailViewModel>(product);
 
@@ -121,18 +123,22 @@ namespace ValueInjecterDEMO.Controllers
 
                 vmmapper.AddMap<ProductViewModel, Product>(src =>
                 {
-                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id) }), src);
-                    product.Name = src.SerialNo + src.Name;
-                    product.Description = src.Desc;
-                    product.CreatedOnUtc = DateTime.UtcNow;
-                    return product;
+                    var productmodel = new Product();
+
+                    productmodel.InjectFrom(new LoopInjection(new[] { nameof(product.Id) }), src);
+                    productmodel.Name = src.SerialNo + src.Name;
+                    productmodel.Description = src.Desc;
+                    productmodel.CreatedOnUtc = DateTime.UtcNow;
+                    return productmodel;
                 });
                 var demomapper = new MapperInstance();
 
                 demomapper.AddMap<ProductDemoModel, Product>(src =>
                 {
-                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id) }), src);
-                    return product;
+                    var productmodel = product;
+
+                    productmodel.InjectFrom(new LoopInjection(new[] { nameof(productmodel.Id) }), src);
+                    return productmodel;
                 });
 
                 product = vmmapper.Map<ProductViewModel, Product>(vm);
@@ -192,16 +198,17 @@ namespace ValueInjecterDEMO.Controllers
                 //product.SpecNote = vm.SpecNote;
                 #endregion
                 #region 使用套件的寫法
-                Mapper.AddMap<ProductViewModel, Product>(src =>
+                Mapper.AddMap<ProductViewModel, Product>((src, entity) =>
                 {
+                    var productmodel = (Product)entity;
                     //設定Product的Id不對映
-                    product.InjectFrom(new LoopInjection(new[] { nameof(product.Id)}), src);
+                    productmodel.InjectFrom(src);
                     //設定Product的Name對映到ProductViewModel的SerialNo加Name
-                    product.Name = src.SerialNo + src.Name;
+                    productmodel.Name = src.SerialNo + src.Name;
                     //設定Product的Description對映到ProductViewModel的Desc
-                    product.Description = src.Desc;
-                    product.ModifiedOnUtc = DateTime.UtcNow;
-                    return product;
+                    productmodel.Description = src.Desc;
+                    productmodel.ModifiedOnUtc = DateTime.UtcNow;
+                    return productmodel;
                 });
 
                 product = Mapper.Map<ProductViewModel, Product>(vm, product);

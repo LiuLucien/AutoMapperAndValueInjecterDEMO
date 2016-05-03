@@ -12,6 +12,11 @@ namespace AutoMapperDEMO
         protected override void Configure()
         {
             CreateMap<Product, ProductDetailViewModel>().ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name));
+            CreateMap<ProductViewModel, Product>()
+                                                .ForMember(s => s.Id, a => a.Ignore())
+                                                .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
+                                                .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
+                                                .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
         }
     }
 
@@ -24,6 +29,7 @@ namespace AutoMapperDEMO
                                                 .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
                                                 .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
                                                 .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
+            CreateMap<ProductDemoModel, Product>();
         }
     }
 

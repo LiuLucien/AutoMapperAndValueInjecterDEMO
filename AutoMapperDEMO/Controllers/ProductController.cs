@@ -70,7 +70,6 @@ namespace AutoMapperDEMO.Controllers
             //建立類別轉換的設定
             IMapper mapper = new MapperConfiguration(c =>
             {
-                c.CreateMap<Product, ProductDetailViewModel>();
                 c.AddProfile<ProductDetailsProfile>();
             }).CreateMapper();
 
@@ -127,14 +126,11 @@ namespace AutoMapperDEMO.Controllers
                 ProductDemoModel demo = new ProductDemoModel();
                 IMapper mapper = new MapperConfiguration(c =>
                 {
-                    c.CreateMap<ProductViewModel, Product>();
                     c.AddProfile<ProductCreateProfile>();
                 }).CreateMapper();
-
-                IMapper mapperDemo = new MapperConfiguration(c => c.CreateMap<ProductDemoModel, Product>()).CreateMapper();
-
+                
                 mapper.Map(vm, product);
-                product = mapperDemo.Map(demo, product);
+                mapper.Map(demo, product);
                 db.Product.Add(product);
                 #endregion
                 db.SaveChanges();
@@ -192,7 +188,6 @@ namespace AutoMapperDEMO.Controllers
                 #region 使用套件的寫法
                 IMapper mapper = new MapperConfiguration(c =>
                 {
-                    c.CreateMap<ProductViewModel, Product>();
                     c.AddProfile<ProductEditProfile>();
                 }).CreateMapper();
                 mapper.Map(vm, product);
