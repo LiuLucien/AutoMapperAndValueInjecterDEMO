@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using AutoMapper.Mappers;
 using AutoMapper;
+using AutoMapperDEMO.Helper;
 
 namespace AutoMapperDEMO.App_Start
 {
@@ -20,12 +21,10 @@ namespace AutoMapperDEMO.App_Start
             //註冊Controllers
             builder.RegisterControllers(Assembly.GetExecutingAssembly());
 
-            //註冊組件型別
-            var mappings = Assembly.Load("AutoMapperDEMO");
-
-            builder.RegisterAssemblyTypes(mappings)
-               .Where(i => i.Name.EndsWith("Profile"))
-               .As(i => i.BaseType);
+            //註冊組件型別,透過Namespace 來取得所有介面與介面實作
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
+                   .Where(i => i.Namespace.EndsWith(".Helper"))
+                   .AsImplementedInterfaces();
 
             //建立容器
             var container = builder.Build();

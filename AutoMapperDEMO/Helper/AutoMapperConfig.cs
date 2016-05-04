@@ -6,23 +6,25 @@ using AutoMapper;
 using AutoMapperDEMO.Models;
 using AutoMapperDEMO.Helper;
 
-namespace AutoMapperDEMO
+namespace AutoMapperDEMO.Helper
 {
     public class AutoMapperConfig : IAutoMapperConfig
     {
-        //public IMapper GetMapper(Profile profile)
-        //{
-        //    var config = new MapperConfiguration(c => { c.AddProfile(profile); });
-        //    return config.CreateMapper();
-        //}
-
-        public IMapper GetMapper<T>() where T : new()
+        public MapperConfiguration GetConfig<T>() where T : Profile, new()
         {
-            //T t = new T();
-            //var name = nameof(T);
-            //var config = new MapperConfiguration(c => { c.AddProfile(new Profile(name)()); });
-            //return config.CreateMapper();
-            throw new NotImplementedException();
+            return new MapperConfiguration(c => { c.AddProfile<T>(); });
+        }
+
+        public IMapper GetMapper<T>() where T : Profile, new()
+        {
+            return GetConfig<T>().CreateMapper();
+        }
+
+        public TDestination Map<TProfile, TDestination>(object source) where TProfile : Profile, new()
+        {
+            var mapper = GetMapper<TProfile>();
+
+            return mapper.Map<TDestination>(source);
         }
     }
 
@@ -40,10 +42,10 @@ namespace AutoMapperDEMO
         {
             CreateMap<Product, ProductDetailViewModel>().ForMember(s => s.CategoryName, a => a.MapFrom(x => x.ProductCategory.Name));
             CreateMap<ProductViewModel, Product>()
-                                                .ForMember(s => s.Id, a => a.Ignore())
-                                                .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
-                                                .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
-                                                .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
+            .ForMember(s => s.Id, a => a.Ignore())
+            .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
+            .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
+            .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
         }
     }
 
@@ -52,10 +54,10 @@ namespace AutoMapperDEMO
         protected override void Configure()
         {
             CreateMap<ProductViewModel, Product>()
-                                                .ForMember(s => s.Id, a => a.Ignore())
-                                                .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
-                                                .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
-                                                .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
+            .ForMember(s => s.Id, a => a.Ignore())
+            .ForMember(s => s.Name, a => a.MapFrom(s => string.Format("{0}{1}", s.SerialNo, s.Name)))
+            .ForMember(s => s.Description, a => a.MapFrom(s => s.Desc))
+            .ForMember(s => s.CreatedOnUtc, a => a.UseValue(DateTime.UtcNow));
             CreateMap<ProductDemoModel, Product>();
         }
     }
@@ -64,17 +66,19 @@ namespace AutoMapperDEMO
     {
         protected override void Configure()
         {
+            CreateMap<Product, ProductViewModel>();
+
             CreateMap<ProductViewModel, Product>()
-                                               //設定Product的Id不對映
-                                               .ForMember(s => s.Id, a => a.Ignore())
-                                               //設定Product的Name對映到ProductViewModel的SerialNo加Name
-                                               .ForMember(s => s.Name, a => a.MapFrom(x => string.Format("{0}{1}",
-                                                                                                        x.SerialNo,
-                                                                                                        x.Name)))
-                                               //設定Product的Description對映到ProductViewModel的Desc
-                                               .ForMember(s => s.Description, a => a.MapFrom(x => x.Desc))
-                                               //設定Product的ModifiedOnUtc預設為DateTime.UtcNow
-                                               .ForMember(s => s.ModifiedOnUtc, a => a.UseValue(DateTime.UtcNow));
+            //設定Product的Id不對映
+            .ForMember(s => s.Id, a => a.Ignore())
+            //設定Product的Name對映到ProductViewModel的SerialNo加Name
+            .ForMember(s => s.Name, a => a.MapFrom(x => string.Format("{0}{1}",
+            x.SerialNo,
+            x.Name)))
+            //設定Product的Description對映到ProductViewModel的Desc
+            .ForMember(s => s.Description, a => a.MapFrom(x => x.Desc))
+            //設定Product的ModifiedOnUtc預設為DateTime.UtcNow
+            .ForMember(s => s.ModifiedOnUtc, a => a.UseValue(DateTime.UtcNow));
         }
     }
 

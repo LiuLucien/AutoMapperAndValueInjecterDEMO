@@ -31,10 +31,7 @@ namespace AutoMapperDEMO.Controllers
                                      .OrderByDescending(s => s.CreatedOnUtc)
                                      .ToList();
 
-            var config = new MapperConfiguration(c => { c.AddProfile<ProductIndexProfile>(); });
-            IMapper mapper = config.CreateMapper();
-
-            List<ProductViewModel> vm = mapper.Map<List<ProductViewModel>>(products);
+            List<ProductViewModel> vm = _mapper.GetMapper<ProductIndexProfile>().Map<List<ProductViewModel>>(products);
 
             return View(vm);
         }
@@ -61,10 +58,7 @@ namespace AutoMapperDEMO.Controllers
             var productNames = db.Product.Where(s => s.CategoryId == id).Select(s => s.Name).ToList();
             var categoryViewModel = new CategoryViewModel();
 
-            IMapper mapper = new MapperConfiguration(c =>
-            {
-                c.AddProfile<ProductCategoryProfile>();
-            }).CreateMapper();
+            IMapper mapper = _mapper.GetMapper<ProductCategoryProfile>();
 
             //對映類別資料
             mapper.Map(productCategory, categoryViewModel);
@@ -81,51 +75,17 @@ namespace AutoMapperDEMO.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = GetProductById(id.Value);
-            if (product == null)
+
+            //導覽屬性對映，ProjectTo範例
+            MapperConfiguration Config = _mapper.GetConfig<ProductDetailsProfile>();
+
+            ProductDetailViewModel vm = db.Product.ProjectTo<ProductDetailViewModel>(Config).FirstOrDefault(s => s.Id == id);
+
+            if (vm == null)
             {
                 return HttpNotFound();
             }
-            ProductDetailViewModel vm = new ProductDetailViewModel();
-
-            #region 傳統寫法
-            //vm = new ProductDetailViewModel()
-            //{
-            //    Id = product.Id,
-            //    Name = product.Name,
-            //    Attribute = product.Attribute,
-            //    Price = product.Price,
-            //    PromotionPrice = product.PromotionPrice,
-            //    LimitCount = product.LimitCount,
-            //    SpecNote = product.SpecNote,
-            //    Description = product.Description,
-            //    ActiveEDate = product.ActiveEDate,
-            //    ActiveEnable = product.ActiveEnable,
-            //    ActiveSDate = product.ActiveSDate,
-            //    CreatedOnUtc = product.CreatedOnUtc,
-            //    ModifiedOnUtc = product.ModifiedOnUtc,
-            //    IsDelete = product.IsDelete,
-            //    CategoryName = product.ProductCategory.Name
-            //};
-            #endregion
-
-            #region 使用套件的寫法
-            //建立類別轉換的設定
-            //IMapper mapper = new MapperConfiguration(c =>
-            //{
-            //    c.AddProfile<ProductDetailsProfile>();
-            //}).CreateMapper();
-
-            vm = Mapper.Map<ProductDetailViewModel>(product);
-            #endregion
-
-            #region 導覽屬性對映，ProjectTo範例
-            //MapperConfiguration Config = new MapperConfiguration(c => c.CreateMap<Product, ProductDetailViewModel>()
-            //                                                           .ForMember(s => s.CategoryName,
-            //                                                                           a => a.MapFrom(x => x.ProductCategory.Name)));
-
-            //ProductDetailViewModel vm = db.Product.ProjectTo<ProductDetailViewModel>(Config).FirstOrDefault(s => s.Id == id);
-            #endregion
+            
             return View(vm);
         }
 
@@ -138,8 +98,6 @@ namespace AutoMapperDEMO.Controllers
         }
 
         // POST: Product/Create
-        // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
-        // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(ProductViewModel vm)
@@ -148,34 +106,9 @@ namespace AutoMapperDEMO.Controllers
             {
                 Product product = new Product();
 
-                #region 傳統寫法
-                //product = new Product()
-                //{
-                //    Name = vm.SerialNo + vm.Name,
-                //    CategoryId = vm.CategoryId,
-                //    SpecNote = vm.SpecNote,
-                //    Price = vm.Price,
-                //    PromotionPrice = vm.PromotionPrice,
-                //    LimitCount = vm.LimitCount,
-                //    ActiveSDate = vm.ActiveSDate,
-                //    ActiveEDate = vm.ActiveEDate,
-                //    ActiveEnable = vm.ActiveEnable,
-                //    Attribute = vm.Attribute,
-                //    Description = vm.Desc,
-                //    CreatedOnUtc = DateTime.UtcNow
-                //};
-                #endregion
-                #region 使用套件的寫法
-                ProductDemoModel demo = new ProductDemoModel();
-                IMapper mapper = new MapperConfiguration(c =>
-                {
-                    c.AddProfile<ProductCreateProfile>();
-                }).CreateMapper();
-
-                mapper.Map(vm, product);
-                mapper.Map(demo, product);
+                _mapper.GetMapper<ProductCreateProfile>().Map(vm, product);
                 db.Product.Add(product);
-                #endregion
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -195,8 +128,7 @@ namespace AutoMapperDEMO.Controllers
             {
                 return HttpNotFound();
             }
-            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductViewModel>()).CreateMapper();
-            ProductViewModel vm = mapper.Map<ProductViewModel>(product);
+            ProductViewModel vm = _mapper.GetMapper<ProductEditProfile>().Map<ProductViewModel>(product);
 
             vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name", vm.CategoryId);
 
@@ -214,29 +146,12 @@ namespace AutoMapperDEMO.Controllers
             {
                 Product product = GetProductById(vm.Id);
 
-                #region 傳統寫法
-                //product.Name = vm.SerialNo + vm.Name;
-                //product.Price = vm.Price;
-                //product.CategoryId = vm.CategoryId;
-                //product.Description = vm.Desc;
-                //product.ActiveSDate = vm.ActiveSDate;
-                //product.ActiveEDate = vm.ActiveEDate;
-                //product.ActiveEnable = vm.ActiveEnable;
-                //product.Attribute = vm.Attribute;
-                //product.LimitCount = vm.LimitCount;
-                //product.ModifiedOnUtc = DateTime.UtcNow;
-                //product.PromotionPrice = vm.PromotionPrice;
-                //product.SpecNote = vm.SpecNote;
-                #endregion
-                #region 使用套件的寫法
-                IMapper mapper = new MapperConfiguration(c =>
+                if (product != null)
                 {
-                    c.AddProfile<ProductEditProfile>();
-                }).CreateMapper();
-                mapper.Map(vm, product);
-                #endregion
-                db.SaveChanges();
+                    _mapper.GetMapper<ProductEditProfile>().Map(vm, product);
 
+                    db.SaveChanges();
+                }
                 return RedirectToAction("Index");
             }
             vm.CategoryList = new SelectList(db.ProductCategory, "Id", "Name", vm.CategoryId);
