@@ -4,9 +4,36 @@ using System.Linq;
 using System.Web;
 using AutoMapper;
 using AutoMapperDEMO.Models;
+using AutoMapperDEMO.Helper;
 
 namespace AutoMapperDEMO
 {
+    public class AutoMapperConfig : IAutoMapperConfig
+    {
+        //public IMapper GetMapper(Profile profile)
+        //{
+        //    var config = new MapperConfiguration(c => { c.AddProfile(profile); });
+        //    return config.CreateMapper();
+        //}
+
+        public IMapper GetMapper<T>() where T : new()
+        {
+            //T t = new T();
+            //var name = nameof(T);
+            //var config = new MapperConfiguration(c => { c.AddProfile(new Profile(name)()); });
+            //return config.CreateMapper();
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ProductIndexProfile : Profile
+    {
+        protected override void Configure()
+        {
+            CreateMap<Product, ProductViewModel>();
+        }
+    }
+
     public class ProductDetailsProfile : Profile
     {
         protected override void Configure()

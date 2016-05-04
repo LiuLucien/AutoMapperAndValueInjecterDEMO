@@ -9,12 +9,19 @@ using System.Web.Mvc;
 using AutoMapperDEMO.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using AutoMapperDEMO.Helper;
 
 namespace AutoMapperDEMO.Controllers
 {
     public class ProductController : Controller
     {
         private AutoMapperAndValueInjecterDEMOEntities db = new AutoMapperAndValueInjecterDEMOEntities();
+        private readonly IAutoMapperConfig _mapper;
+
+        public ProductController(IAutoMapperConfig mapper)
+        {
+            _mapper = mapper;
+        }
 
         // GET: Product
         public ActionResult Index()
@@ -24,7 +31,8 @@ namespace AutoMapperDEMO.Controllers
                                      .OrderByDescending(s => s.CreatedOnUtc)
                                      .ToList();
 
-            IMapper mapper = new MapperConfiguration(c => c.CreateMap<Product, ProductViewModel>()).CreateMapper();
+            var config = new MapperConfiguration(c => { c.AddProfile<ProductIndexProfile>(); });
+            IMapper mapper = config.CreateMapper();
 
             List<ProductViewModel> vm = mapper.Map<List<ProductViewModel>>(products);
 
@@ -103,12 +111,12 @@ namespace AutoMapperDEMO.Controllers
 
             #region 使用套件的寫法
             //建立類別轉換的設定
-            IMapper mapper = new MapperConfiguration(c =>
-            {
-                c.AddProfile<ProductDetailsProfile>();
-            }).CreateMapper();
+            //IMapper mapper = new MapperConfiguration(c =>
+            //{
+            //    c.AddProfile<ProductDetailsProfile>();
+            //}).CreateMapper();
 
-            vm = mapper.Map<ProductDetailViewModel>(product);
+            vm = Mapper.Map<ProductDetailViewModel>(product);
             #endregion
 
             #region 導覽屬性對映，ProjectTo範例
@@ -163,7 +171,7 @@ namespace AutoMapperDEMO.Controllers
                 {
                     c.AddProfile<ProductCreateProfile>();
                 }).CreateMapper();
-                
+
                 mapper.Map(vm, product);
                 mapper.Map(demo, product);
                 db.Product.Add(product);
